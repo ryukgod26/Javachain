@@ -1,0 +1,7 @@
+{
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar",
+        // IMPORTANT: Change this path to your actual JavaFX SDK lib folder
+        "D:javafx-sdk-24.0.2/lib//*.jar" 
+    ]
+}
