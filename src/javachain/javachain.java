@@ -2,16 +2,30 @@ package src.javachain;
 import java.util.ArrayList;
 //import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
+import java.security.Security;
+import java.security.*;
 
 public class javachain{
 
   public static ArrayList<Block> blockchain = new ArrayList<Block>();
   public static int difficulty = 1;
     public static void main(String[] args){
-      
-	    blockchain.add(new Block("0","This is the First Block"));
-System.out.println("Block is getting Mined....");
+
+	//Adding Bouncy Castle as a Security Provider
+      Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+	
+      Wallet test1 = new Wallet();
+      Wallet test2 = new Wallet();
+
+      System.out.println("Public Key of wallet test 1 is: " + test1.publicKey + "\nPrivate Key for wallet test1 is: " + test1.privateKey);
+
+      Transaction transfer = new Transaction(test1.publicKey,test2.publicKey,5,null);
+	System.out.println("Generating Signature.....");
+      transfer.generateSignature(test1.privateKey);
+	System.out.println("Verifying Signature....");
+	transfer.verifySignature();
+/*	    blockchain.add(new Block("0","This is the First Block"));
+/System.out.println("Block is getting Mined....");
 blockchain.get(blockchain.size()-1).mineBlock(difficulty);
 	    blockchain.add(new Block(blockchain.get(blockchain.size()-1).hash,"Secret data of second block"));
 	    System.out.println("Block is getting Mined....");
@@ -19,11 +33,9 @@ blockchain.get(blockchain.size()-1).mineBlock(difficulty);
 	    blockchain.add(new Block(blockchain.get(blockchain.size()-1).hash,"Secret data of third block"));
 	    System.out.println("Block is getting Mined....");
 	    blockchain.get(blockchain.size()-1).mineBlock(difficulty);
-//        String blockchainJson =  new GsonBuilder().setPrettyPrinting().create().toJson(blockchain);		
-//		System.out.println(blockchainJson);
 		String blockchainJson = new GsonBuilder().setPrettyPrinting().create().toJson(blockchain);		
 		System.out.println(blockchainJson);
-	    System.out.println(ischainValid());
+	    System.out.println(ischainValid());*/
 	}
     public static Boolean ischainValid(){
     Block currentBlock;

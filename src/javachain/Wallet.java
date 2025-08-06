@@ -3,7 +3,7 @@ package src.javachain;
 import java.security.*;
 import java.security.spec.ECGenParameterSpec;
 public class Wallet {
-    private PublicKey publicKey;
+    public PublicKey publicKey;
     public PrivateKey privateKey;
 
     public Wallet(){

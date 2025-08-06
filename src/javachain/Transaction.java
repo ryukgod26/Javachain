@@ -27,11 +27,21 @@ public class Transaction{
     private String calculateHash(){
         //To make Every Transaction Id Unique
         sequence++;
-         StringUtil.applySha256(
+        return  StringUtil.applySha256(
           StringUtil.getStringFromKey(sender) + 
           StringUtil.getStringFromKey(receiver) + 
           Float.toString(value) + Integer.toString(sequence)
         );
     }
+    public void generateSignature(PrivateKey privateKey){
+    String data = StringUtil.getStringFromKey(sender) + StringUtil.getStringFromKey(receiver) + Float.toString(value);
+    signature = StringUtil.applyECDSAsig(privateKey,data);
+    }
+
+    public boolean verifySignature(){
+   String data = StringUtil.getStringFromKey(sender) + StringUtil.getStringFromKey(receiver) + Float.toString(value);
+   return StringUtil.verifyECDSA(sender,data,signature);
+    }
+
     
 }
