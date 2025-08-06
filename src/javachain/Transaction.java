@@ -11,8 +11,8 @@ public class Transaction{
     public  byte[] signature;
     public float value;
 
-    public ArrayList<TransactionInput> transactionInput = new ArrayList<TransactionInput>();
-    public ArrayList<TransactionOutput> transactionOutput = new ArrayList<TransactionOutput>();
+    public ArrayList<TransactionInput> transactionInputs = new ArrayList<TransactionInput>();
+    public ArrayList<TransactionOutput> transactionOutputs = new ArrayList<TransactionOutput>();
 
     private static int sequence = 0; // a rough count of how many transactions has been maded
 
@@ -21,7 +21,7 @@ public class Transaction{
         this.sender = from;
         this.receiver = to;
         this.value = value;
-        this.transactionInput = tInput;
+        this.transactionInputs = tInput;
     }
 
     private String calculateHash(){
@@ -43,5 +43,61 @@ public class Transaction{
    return StringUtil.verifyECDSA(sender,data,signature);
     }
 
-    
+    public boolean  processTransaction(){
+
+        //Verifying Signature
+        if(verifySignature() == false){
+            System.out.println("Signature Verification Failed!!!");
+            return  false;
+        }
+
+        //Getting the unspent UTXOS
+        for(TransactionInput t :  transactionInputs ){
+            t.UTXO = javachain.UTXOs.get(t.transferOutpuId);
+        }
+
+        if(getInputValue() < javachain.minimumTransactionValue){
+            System.out.println("!!!Transaction Input is very Small: " + getInputValue());
+            return false;
+        }
+
+        float newBalance = getInputValue() - value;
+        transactionId = calculateHash();
+        transactionOutputs.add(new TransactionOutput(receiver, value, transactionId));
+        transactionOutputs.add(new TransactionOutput(sender, newBalance, transactionId));
+
+        //add Outputs to the not spent list
+        for(TransactionOutput o : transactionOutputs){
+            javachain.UTXOs.put(o.id, o);
+        }
+
+        //Remove Inputs from the UTXOs List
+        for(TransactionInput i:transactionInputs){
+            if(i != null){
+                javachain.UTXOs.remove(i.UTXO.id);
+            }
+        }
+        return true;
+
+    }
+    // Get The Sum of values of inputs
+    public float getInputValue(){
+        float sum = 0;
+        for(TransactionInput i : transactionInputs){
+            if(i.UTXO != null){
+                sum += i.UTXO.value;
+            }
+        }
+        return sum;
+    }
+
+    // Get the sum of outputs
+    public float getOutputValue(){
+        float sum =0;
+        for(TransactionOutput o:transactionOutputs){
+            sum += o.value;
+        }
+        return sum;
+    }
+
 }
